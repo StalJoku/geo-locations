@@ -8,7 +8,7 @@ use App\User;
 
 class FilterController extends Controller
 {
-    public function filter($name = 'imei'){
+    public function filter($name = 'created_at'){
 
 		switch ($name) {
 		    case "name":

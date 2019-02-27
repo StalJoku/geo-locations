@@ -36,7 +36,7 @@ class HomeController extends Controller
         $user_id = $request->user()->id;
         $devices = User::find($user_id)->devices;
         $totalDevices = count($devices);
-        $pagedDevices = User::find($user_id)->devices()->orderBy('imei' , 'desc')->paginate(6);               
+        $pagedDevices = User::find($user_id)->devices()->orderBy('created_at' , 'desc')->paginate(6);               
 
         if($request->ajax()){
             $activeDevices = User::find($user_id)->devices()->wherePivot('active', '=', 1)->get();
@@ -68,7 +68,7 @@ class HomeController extends Controller
     public function getPages(Request $request){
 
         $user_id = $request->user()->id;        
-        $pagedDevices = User::find($user_id)->devices()->orderBy('imei' , 'desc')->paginate(6); 
+        $pagedDevices = User::find($user_id)->devices()->orderBy('created_at' , 'desc')->paginate(6); 
         if($request->ajax()){  
             //return response()->json(['pagedDevices' => $pagedDevices]);
             return response()->json([
@@ -141,6 +141,7 @@ class HomeController extends Controller
             $device->users()->attach($user_id);            
         }
         
+        $updateStatus = User::find($user_id)->devices()->updateExistingPivot($device->id, ['active' => 0]);
         $device->name = $deviceName;
         $device->longitude = $deviceLatitude;
         $device->latitude = $deviceLongitude;

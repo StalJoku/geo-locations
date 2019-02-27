@@ -33,7 +33,7 @@ Route::post('/update',[
 
 Route::get('/home', [
 	'uses' => 'HomeController@getDevices',
-	'as' => 'home'
+	'as' => 'get.devices'
 ]);
 
 Route::post('/update-add-device', [

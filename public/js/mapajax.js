@@ -22,10 +22,13 @@
     function initMap(data) {    	
 
     	var devices = data.mapObj;
+    	console.log(devices);
     	var Latlng;
     	if(devices.length){
+
     		Latlng = {lat: devices[0].coords.lat, lng: devices[0].coords.lng};
 		}
+
         var mapOptions = {
             zoom: 2,
             center: Latlng

@@ -99,5 +99,6 @@
 @endsection
 @section('scripts')
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxvd0XSChs81t4Z_wmk8QkWB_SbuiAvi0"></script> 
-    <script src="{{ asset('js/production.min.js') }}"></script>  
+   <!--  <script src="{{ asset('js/production.min.js') }}"></script>  -->
+     <script src="{{ asset('js/mapajax.js') }}"></script>  
 @endsection
