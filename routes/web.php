@@ -14,3 +14,39 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/admin/dashboard', [
+	'uses' => 'AdminController@admin',
+	'middleware' => 'is_admin',
+	'as' => 'admin.dashboard'
+]);
+
+Auth::routes();
+
+//Route::get('/home', 'HomeController@index')->name('home');
+
+Route::post('/update',[
+	'uses' => 'HomeController@updateDeviceStatus',
+	'as' => 'update.status'
+]);
+
+
+Route::get('/home', [
+	'uses' => 'HomeController@getDevices',
+	'as' => 'home'
+]);
+
+Route::post('/update-add-device', [
+	'uses' => 'HomeController@addUpdateDevice',
+	'as' => 'update.add.device'
+]);
+
+Route::get('/get-pages', [
+	'uses' => 'HomeController@getPages',
+	'as' => 'get.pages'
+]);
+
+Route::get('admin/order-by/{name?}', [
+	'uses' => 'FilterController@filter',
+	'as' => 'filter.devices'
+]);

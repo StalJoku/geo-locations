@@ -7,7 +7,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
-{
+{   
+    public function devices() {
+        return $this->belongsToMany('App\Device')->withPivot('active');
+    }
+    
     use Notifiable;
 
     /**
@@ -16,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'type',
     ];
 
     /**
@@ -27,6 +31,14 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    const ADMIN_TYPE = 'admin';
+    const DEFAULT_TYPE = 'client';
+
+    public function isAdmin()
+    {        
+        return $this->type === self::ADMIN_TYPE;        
+    }
 
     /**
      * The attributes that should be cast to native types.
