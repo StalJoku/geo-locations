@@ -34,35 +34,34 @@ class HomeController extends Controller
     public function getDevices(Request $request){
 
         $user_id = $request->user()->id;
-        $devices = User::find($user_id)->devices;
-        $totalDevices = count($devices);
         $pagedDevices = User::find($user_id)->devices()->orderBy('created_at' , 'desc')->paginate(6);               
-
+        $activeDevices = User::find($user_id)->devices()->wherePivot('active', 1)->orderBy('created_at', 'desc')->get();
+        
         if($request->ajax()){
-            $activeDevices = User::find($user_id)->devices()->wherePivot('active', '=', 1)->get();
 
             $mapObj = array();        
 
             foreach ($activeDevices as $device) {
-                $findAddress = Geocoder::getAddressForCoordinates($device['attributes']['latitude'], $device['attributes']['longitude']);
+                $findAddress = Geocoder::getAddressForCoordinates($device->latitude, $device->longitude);
                           
                 $mapObj[] = array( 
                     'coords' => 
                         array( 
-                            'lat' => $device['attributes']['latitude'], 
-                            'lng' => $device['attributes']['longitude'] 
+                            'lat' => $device->latitude, 
+                            'lng' => $device->longitude 
                         ), 
-                    'title' => $device['attributes']['name'], 
+                    'title' => $device->name, 
                     'address' => $findAddress['formatted_address'],
-                    'imei' => $device['attributes']['imei'],
-                    'id' => $device['attributes']['id']
+                    'imei' => $device->imei,
+                    'id' => $device->id
                 ); 
                
             }
-            return response()->json(['mapObj' => $mapObj]);
+            return response()->json(compact('mapObj'));
         }
        
-        return view('home', ['devicesPerUser' => $pagedDevices, 'totalDevices' => $totalDevices]);
+        //return view('home', ['devicesPerUser' => $pagedDevices, 'totalDevices' => $totalDevices]);
+        return view('home', compact('pagedDevices'));
     }
 
     public function getPages(Request $request){
@@ -72,12 +71,12 @@ class HomeController extends Controller
         if($request->ajax()){  
             //return response()->json(['pagedDevices' => $pagedDevices]);
             return response()->json([
-                'html' => view('pagination', ['devicesPerUser' => $pagedDevices])->render()
+                'html' => view('pagination', compact('pagedDevices'))->render()
             ]);
                  
         }
         
-        return view('pagination', ['devicesPerUser' => $pagedDevices]);               
+        return view('pagination', compact('pagedDevices'));               
           
     }
 
@@ -91,17 +90,17 @@ class HomeController extends Controller
 
             $user_id = $request->user()->id;
             
-            $newDevice = Device::find($geoId);
+            $newDevice = Device::find($geoId)->get();
             
-            $newAddress = Geocoder::getAddressForCoordinates($newDevice['latitude'], $newDevice['longitude']);
+            $address = Geocoder::getAddressForCoordinates($newDevice['latitude'], $newDevice['longitude']);
             
 
             $updateStatus = User::find($user_id)->devices()->updateExistingPivot($geoId, ['active' => $status]);        
             
             return response()->json([
                 'msg'=>'Updated Successfully', 
-                'success'=>true, 
-                'newDevice' => $newDevice, 'address' => $newAddress
+                compact('newDevice','address')
+                
             ]);
             
                
@@ -147,6 +146,6 @@ class HomeController extends Controller
         $device->latitude = $deviceLongitude;
         $device->update();
         
-        return response()->json(['msg' => 'Updated Successfully', 'newDevice' => $device]);
+        return response()->json(['msg' => 'Updated Successfully', 'newDevice'=> $device]);
     }
 }
